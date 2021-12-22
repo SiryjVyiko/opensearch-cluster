@@ -159,7 +159,7 @@ actions:
   setOpensearchHostname:
     - cmd[odash]: |-
         sed -ci -e 's/^opensearch.hosts.*/opensearch.hosts:/' ${globals.oSearchDashConfig};        
-        sed -ci -e '/^opensearch.hosts/ a\  - https://${this.nodeAddress}:9200' ${globals.oSearchDashConfig};
+        grep -q '- https://${this.nodeAddress}:9200' ${globals.oSearchDashConfig} || sed -ci -e '/^opensearch.hosts/ a\  - https://${this.nodeAddress}:9200' ${globals.oSearchDashConfig};
       user: root
       
   setKibanaserverPassword:
