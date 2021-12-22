@@ -129,10 +129,8 @@ actions:
            nodeId: ${@osnode.id}
            nodeAddress: ${@osnode.address}
     - if ('${settings.is_opensearchdashboards}' == 'true'):
-      - setCapabilities
       - setKibanaserverPassword
-      - addOSearchNodesToOSearchDashboard
-      - api[odash]: environment.control.RestartNodesByGroup
+      - updateOpensearchDashboardsConfig
     - cmd[${nodes.nosqldb.master.id}]: sed -ci -e '/^cluster.initial_master_nodes/d' ${globals.oSearchConfig};
     
   addNodeToCluster:
@@ -150,9 +148,7 @@ actions:
       - cmd[lstash]: |-
           sed -ci -e 's/hosts =>  \[/hosts =>  \[\"${this.nodeAddress}\",/' ${globals.lstashPipelineConfig};
     - if ('${settings.is_opensearchdashboards}' == 'true'):
-      - setCapabilities
-      - addOSearchNodesToOSearchDashboard
-      - api[odash]: environment.control.RestartNodesByGroup
+      - updateOpensearchDashboardsConfig
           
   removeNodeFromCluster:
     - cmd[nosqldb]: |-
@@ -230,6 +226,11 @@ actions:
         - cmd[lstash]: |-
             sed -ci -e 's/hosts =>  \[/hosts =>  \[\"${this.nodeAddress}\",/' ${globals.lstashPipelineConfig};
     - api[lstash]: environment.control.RestartNodesByGroup
+
+  updateOpensearchDashboardsConfig:
+    - setCapabilities
+    - addOSearchNodesToOSearchDashboard
+    - api[odash]: environment.control.RestartNodesByGroup
     
   startAndWait:
     - cmd[${this.nodeId}]: |-
