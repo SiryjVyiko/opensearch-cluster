@@ -39,12 +39,7 @@ onAfterServiceScaleOut[lstash]:
 onAfterRedeployContainer[lstash]:
   - if (!${event.params.useExistingVolumes:true}):
     - setLogstashPassword
-    - cmd[lstash]: |-
-        sed -ci -e 's/hosts => .*/hosts =>  ["${nodes.nosqldb.master.address}"]/g' ${globals.lstashPipelineConfig};
-    - forEach(osnode:nodes.nosqldb):
-      - if (${@osnode.id} != ${nodes.nosqldb.master.id}):
-        - cmd[lstash]: |-
-            sed -ci -e 's/hosts =>  \[/hosts =>  \[\"${this.nodeAddress}\",/' ${globals.lstashPipelineConfig};
+    - reAddOSNodesToLogstash
     
 onAfterRedeployContainer[odash]:
   - setCapabilities
@@ -207,6 +202,7 @@ actions:
             sed -ci -e 's/discovery.seed_hosts: \[/discovery.seed_hosts: \[\"${@osnode.address}\",/' ${globals.oSearchConfig};
           user: root
     - api[nosqldb]: environment.control.RestartNodesByGroup
+    - reAddOSNodesToLogstash
     - setOpensearchHostname
     
   reAddNodeToCluster:
@@ -222,6 +218,15 @@ actions:
         - cmd[${this.nodeId}]: |-
             sed -ci -e 's/discovery.seed_hosts: \[/discovery.seed_hosts: \[\"${@osnode.address}\",/' ${globals.oSearchConfig};
     - api[nosqldb]: environment.control.RestartNodesByGroup
+    
+  reAddOSNodesToLogstash:
+    - cmd[lstash]: |-
+        sed -ci -e 's/hosts => .*/hosts =>  ["${nodes.nosqldb.master.address}"]/g' ${globals.lstashPipelineConfig};
+    - forEach(osnode:nodes.nosqldb):
+      - if (${@osnode.id} != ${nodes.nosqldb.master.id}):
+        - cmd[lstash]: |-
+            sed -ci -e 's/hosts =>  \[/hosts =>  \[\"${this.nodeAddress}\",/' ${globals.lstashPipelineConfig};
+    - api[lstash]: environment.control.RestartNodesByGroup
     
   startAndWait:
     - cmd[${this.nodeId}]: |-
