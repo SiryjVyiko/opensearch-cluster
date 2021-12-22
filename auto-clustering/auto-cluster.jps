@@ -204,7 +204,8 @@ actions:
     - api[nosqldb]: environment.control.RestartNodesByGroup
     - if ('${settings.is_logstash}' == 'true'):
       - reAddOSNodesToLogstash
-    - setOpensearchHostname
+    - if ('${settings.is_opensearchdashboards}' == 'true'):
+      - setOpensearchHostname
     
   reAddNodeToCluster:
     - forEach(osnode:nodes.nosqldb):
