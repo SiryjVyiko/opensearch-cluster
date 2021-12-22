@@ -204,7 +204,7 @@ actions:
     - if ('${settings.is_logstash}' == 'true'):
       - reAddOSNodesToLogstash
     - if ('${settings.is_opensearchdashboards}' == 'true'):
-      - cmd[odash]: sed -ci -e '/^[[:space:]]*- https://.*:9200/d' ${globals.oSearchDashConfig}
+      - cmd[odash]: sed -ci -e '|^[[:space:]]*- https://.*:9200|d' ${globals.oSearchDashConfig}
       - setOpensearchHostname
     
   reAddNodeToCluster:
