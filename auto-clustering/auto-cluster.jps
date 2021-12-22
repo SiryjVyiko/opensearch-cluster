@@ -147,6 +147,10 @@ actions:
     - if ('${settings.is_logstash}' == 'true'):
       - cmd[lstash]: |-
           sed -ci -e 's/hosts =>  \[/hosts =>  \[\"${this.nodeAddress}\",/' ${globals.lstashPipelineConfig};
+    - if ('${settings.is_opensearchdashboards}' == 'true'):
+      - setCapabilities
+      - addOSearchNodesToOSearchDashboard
+      - api[odash]: environment.control.RestartNodesByGroup
           
   removeNodeFromCluster:
     - cmd[nosqldb]: |-
