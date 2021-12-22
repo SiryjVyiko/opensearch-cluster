@@ -205,7 +205,9 @@ actions:
       - reAddOSNodesToLogstash
     - if ('${settings.is_opensearchdashboards}' == 'true'):
       - cmd[odash]: sed -ci -e '/^[[:space:]]*- https:\/\/.*:9200/d' ${globals.oSearchDashConfig}
-      - setOpensearchHostname
+      - forEach(osnode:nodes.nosqldb):
+          setOpensearchHostname:
+            nodeAddress: ${@osnode.address}
     
   reAddNodeToCluster:
     - forEach(osnode:nodes.nosqldb):
