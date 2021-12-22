@@ -202,7 +202,8 @@ actions:
             sed -ci -e 's/discovery.seed_hosts: \[/discovery.seed_hosts: \[\"${@osnode.address}\",/' ${globals.oSearchConfig};
           user: root
     - api[nosqldb]: environment.control.RestartNodesByGroup
-    - reAddOSNodesToLogstash
+    - if ('${settings.is_logstash}' == 'true'):
+      - reAddOSNodesToLogstash
     - setOpensearchHostname
     
   reAddNodeToCluster:
