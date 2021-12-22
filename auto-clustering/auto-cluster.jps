@@ -23,12 +23,15 @@ globals:
   lstashPipelineConfig: /etc/logstash/conf.d/logstash-sample.conf
   
 onInstall:
-  - clusterInit
-  - if ('${settings.success_email}' != 'false'):
-    - return:
-        type: success
-        message: /text/success.md
-        email: /text/success.md
+  - if (${settings.clone:false}): 
+    - fixClusterAfterCloneOrMigration
+  - else:
+    - clusterInit
+    - if ('${settings.success_email}' != 'false'):
+      - return:
+          type: success
+          message: /text/success.md
+          email: /text/success.md
       
 onAfterServiceScaleOut[lstash]:
   - setLogstashPassword
@@ -72,9 +75,14 @@ onAfterRedeployContainer[nosqldb]:
 
 onAfterMigrate:
   - fixClusterAfterCloneOrMigration
- 
+
 onAfterClone:
-  - fixClusterAfterCloneOrMigration
+  - script: delete MANIFEST.id; return {result:0, jps:MANIFEST};
+  - install: ${response.jps}
+    envName: ${event.response.env.envName}
+    settings:
+      nodeGroup: ${settings.nodeGroup} 
+      clone: true
   
 onAfterServiceScaleOut[nosqldb]:
 - forEach(osnode:event.response.nodes):
@@ -99,7 +107,6 @@ onBeforeScaleIn[nosqldb]:
 - api[nosqldb]: environment.control.RestartNodesByGroup
 
 actions:
-
   clusterInit:
     - cmd[nosqldb]: |-
         sudo service opensearch stop;
