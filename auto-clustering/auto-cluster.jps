@@ -118,6 +118,9 @@ actions:
       - cmd[lstash]: |-
           sed -ci -e 's/hosts => .*/hosts =>  ["${nodes.nosqldb.master.address}"]/g' ${globals.lstashPipelineConfig};
       - api[lstash]: environment.control.RestartNodesByGroup
+      - cmd[lstash]: |-
+          systemctl enable logstash.service
+        user: root
     - forEach(osnode:nodes.nosqldb):
       - if (${@osnode.id} != ${nodes.nosqldb.master.id}):
          addNodeToCluster:
