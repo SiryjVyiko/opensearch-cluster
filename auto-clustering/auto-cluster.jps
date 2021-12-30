@@ -192,16 +192,16 @@ actions:
   
   fixClusterAfterCloneOrMigration:
     - cmd[nosqldb]: |-
-        sed -ci -e 's/^discovery.seed_hosts:.*/discovery.seed_hosts: ["${nodes.nosqldb.master.address}"]/g' ${globals.oSearchConfig};
+        sed -ci -e 's/^discovery.seed_hosts:.*/discovery.seed_hosts: ["${nodes.nosqldb.master.address}"]/g' ${globals.oSearchConfig}
       user: root
     - forEach(osnode:nodes.nosqldb):
       - cmd[nosqldb]: |-
-          sed -ci -e 's/node.name:.*/node.name: node${@osnode.id}/g' ${globals.oSearchConfig};
+          sed -ci -e 's/node.name:.*/node.name: node${@osnode.id}/g' ${globals.oSearchConfig}
         user: root
         sayYes: false
       - if (${@osnode.id} != ${nodes.nosqldb.master.id}):
         - cmd[nosqldb]: |-
-            sed -ci -e 's/discovery.seed_hosts: \[/discovery.seed_hosts: \[\"${@osnode.address}\",/' ${globals.oSearchConfig};
+            sed -ci -e 's/discovery.seed_hosts: \[/discovery.seed_hosts: \[\"${@osnode.address}\",/' ${globals.oSearchConfig}
           user: root
     - api[nosqldb]: environment.control.RestartNodesByGroup
     - if ('${settings.is_logstash}' == 'true'):
