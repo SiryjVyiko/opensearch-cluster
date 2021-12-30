@@ -71,6 +71,7 @@ onAfterRedeployContainer[nosqldb]:
       - script: delete MANIFEST.id; return {result:0, jps:MANIFEST};
       - install: ${response.jps}
         envName: ${event.params.env}
+        skipNodeEmails: true
         settings:
           nodeGroup: ${settings.nodeGroup}
           is_opensearchdashboards: ${settings.is_opensearchdashboards}
