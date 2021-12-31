@@ -75,6 +75,8 @@ onBeforeScaleIn[nosqldb]:
             sed -ci -e 's/""/","/' ${globals.lstashPipelineConfig};
         - api[lstash]: environment.control.RestartNodesByGroup
     - cmd[nosqldb]: sudo service opensearch stop;
+    - startAndWait:
+        nodeId: ${nodes.nosqldb.join(id,)}
 
 actions:
   clusterInit:
