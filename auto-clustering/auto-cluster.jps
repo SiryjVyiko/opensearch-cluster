@@ -77,12 +77,14 @@ onBeforeScaleIn[nosqldb]:
         - api[lstash]: environment.control.RestartNodesByGroup
     - cmd[${nodes.nosqldb.master.id}]: |-
         curl -X POST "https://localhost:9200/_cluster/voting_config_exclusions?node_names=node${@osnode.id}&pretty" -u 'internal:${globals.intPswd}' --insecure
-    - cmd[nosqldb]: |-
-        sudo service opensearch stop;
-    - startAndWait:
-        nodeId: ${nodes.nosqldb.join(id,)}
-    - cmd[${nodes.nosqldb.master.id}]:
-        curl -X DELETE "https://localhost:9200/_cluster/voting_config_exclusions" -u 'internal:${globals.intPswd}' --insecure
+        
+onAfterScaleIn[nosqldb]:
+  - cmd[nosqldb]: |-
+      sudo service opensearch stop;
+  - startAndWait:
+      nodeId: ${nodes.nosqldb.join(id,)}
+  - cmd[${nodes.nosqldb.master.id}]:
+      curl -X DELETE "https://localhost:9200/_cluster/voting_config_exclusions" -u 'internal:${globals.intPswd}' --insecure
 
 actions:
   clusterInit:
